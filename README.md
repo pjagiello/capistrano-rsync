@@ -55,9 +55,9 @@ cap deploy
 
 ### Implementation
 1. Clones and updates your repository to `build_dir` (defaults to
-   `tmp/deploy`) on your local machine.
+   `_build`) on your local machine.
 2. Checks out the branch set in the `branch` variable (defaults to `master`).
-3. If `rsync_cache` set (defaults to `shared/deploy`), rsyncs to that directory
+3. If `rsync_cache` set (defaults to `shared/_deploy`), rsyncs to that directory
    on the server.
 4. If `rsync_cache` set, copies the content of that directory to a new release
    directory.
@@ -103,8 +103,8 @@ Name          | Default | Description
 --------------|---------|------------
 repo_url      | `.` | The path or URL to a Git repository to clone from.  
 branch        | `master` | The Git branch to checkout.  
-build_dir   | `tmp/deploy` | Path where to clone your repository for staging, checkouting and rsyncing. Can be both relative or absolute.
-rsync_cache   | `shared/deploy` | Path where to cache your repository on the server to avoid rsyncing from scratch each time. Can be both relative or absolute.<br> Set to `nil` if you want to disable the cache.
+build_dir   | `_build` | Path where to clone your repository for staging, checkouting and rsyncing. Can be both relative or absolute.
+rsync_cache   | `shared/_deploy` | Path where to cache your repository on the server to avoid rsyncing from scratch each time. Can be both relative or absolute.<br> Set to `nil` if you want to disable the cache.
 rsync_options | `[]` | Array of options to pass to `rsync`.  
 
 

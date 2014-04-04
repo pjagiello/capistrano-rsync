@@ -19,12 +19,12 @@ namespace :load do
 
     # Where on the local machine the build happens. This is where we are
     # rsyncing from.
-    set :build_dir, "tmp/deploy"
+    set :build_dir, "_build"
 
     # Cache is used on the server to copy files to from to the release directory.
     # Saves you rsyncing your whole app folder each time.  If you nil rsync_cache,
     # Capistrano::Rsync will sync straight to the release path.
-    set :rsync_cache, "shared/deploy"
+    set :rsync_cache, "shared/_deploy"
   end
 end
 

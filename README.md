@@ -54,7 +54,7 @@ cap deploy
 ```
 
 ### Implementation
-1. Clones and updates your repository to `rsync_stage` (defaults to
+1. Clones and updates your repository to `build_dir` (defaults to
    `tmp/deploy`) on your local machine.
 2. Checks out the branch set in the `branch` variable (defaults to `master`).
 3. If `rsync_cache` set (defaults to `shared/deploy`), rsyncs to that directory
@@ -81,7 +81,7 @@ set :rsync_options, %w[
 Capistrano::Rsync runs `rsync:stage` before rsyncing. Hook to that like this:
 ```ruby
 task :precompile do
-  Dir.chdir fetch(:rsync_stage) do
+  Dir.chdir fetch(:build_dir) do
     system "rake", "assets:precompile"
   end
 end
@@ -103,7 +103,7 @@ Name          | Default | Description
 --------------|---------|------------
 repo_url      | `.` | The path or URL to a Git repository to clone from.  
 branch        | `master` | The Git branch to checkout.  
-rsync_stage   | `tmp/deploy` | Path where to clone your repository for staging, checkouting and rsyncing. Can be both relative or absolute.
+build_dir   | `tmp/deploy` | Path where to clone your repository for staging, checkouting and rsyncing. Can be both relative or absolute.
 rsync_cache   | `shared/deploy` | Path where to cache your repository on the server to avoid rsyncing from scratch each time. Can be both relative or absolute.<br> Set to `nil` if you want to disable the cache.
 rsync_options | `[]` | Array of options to pass to `rsync`.  
 

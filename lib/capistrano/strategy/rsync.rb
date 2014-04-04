@@ -17,8 +17,9 @@ namespace :load do
     set :rsync_options, []
     set :rsync_copy, "rsync --archive --acls --xattrs"
 
-    # Stage is used on your local machine for rsyncing from.
-    set :rsync_stage, "tmp/deploy"
+    # Where on the local machine the build happens. This is where we are
+    # rsyncing from.
+    set :build_dir, "tmp/deploy"
 
     # Cache is used on the server to copy files to from to the release directory.
     # Saves you rsyncing your whole app folder each time.  If you nil rsync_cache,
@@ -37,7 +38,7 @@ task :rsync => %w[rsync:stage] do
 
     rsync_args = []
     rsync_args.concat fetch(:rsync_options)
-    rsync_args << fetch(:rsync_stage) + "/"
+    rsync_args << fetch(:build_dir) + "/"
     rsync_args << "#{user}#{role.hostname}:#{rsync_cache.call || release_path}"
 
     run_locally do
@@ -62,16 +63,16 @@ namespace :rsync do
   end
 
   task :create_stage do
-    next if File.directory?(fetch(:rsync_stage))
+    next if File.directory?(fetch(:build_dir))
 
     run_locally do
-      execute :git, 'clone', fetch(:repo_url, "."), fetch(:rsync_stage)
+      execute :git, 'clone', fetch(:repo_url, "."), fetch(:build_dir)
     end
   end
 
   desc "Stage the repository in a local directory."
   task :stage => %w[create_stage] do
-    Dir.chdir fetch(:rsync_stage) do
+    Dir.chdir fetch(:build_dir) do
       run_locally do
         execute :git, 'fetch --quiet --all --prune'
         execute :git, "reset --hard origin/#{fetch(:branch)}"

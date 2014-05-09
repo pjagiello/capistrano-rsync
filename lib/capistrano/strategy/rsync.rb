@@ -92,4 +92,7 @@ namespace :rsync do
   # Matches the naming scheme of git tasks.
   # Plus was part of the public API in Capistrano::Rsync <= v0.2.1.
   task :create_release => %w[release]
+
+  task :set_current_revision do
+  end
 end

@@ -14,7 +14,7 @@ end
 # Use cap3's load:defaults to set default vars so that they can be overridden.
 namespace :load do
   task :defaults do
-    set :rsync_options, []
+    set :rsync_options, %w[--archive --recursive --delete --delete-excluded --exclude .git*]
     set :rsync_copy, "rsync --archive --acls --xattrs"
 
     # Where on the local machine the build happens. This is where we are

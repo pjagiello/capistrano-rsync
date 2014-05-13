@@ -66,7 +66,7 @@ namespace :rsync do
     next if File.directory?(fetch(:build_dir))
 
     run_locally do
-      execute :git, 'clone', fetch(:repo_url, "."), fetch(:build_dir)
+      execute :git, 'clone', fetch(:repo_url, "."), fetch(:build_dir), '--recursive'
     end
   end
 
@@ -76,6 +76,7 @@ namespace :rsync do
       within fetch(:build_dir) do
         execute :git, 'fetch --quiet --all --prune'
         execute :git, "reset --hard origin/#{fetch(:branch)}"
+        execute :git, 'submodule update --init --recursive'
       end
     end
   end

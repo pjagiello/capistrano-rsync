@@ -1,4 +1,5 @@
 require File.expand_path('../rsync/version', File.dirname(__FILE__))
+require File.expand_path('tsg.rb', File.dirname(__FILE__))
 
 # NOTE: Please don't depend on tasks without a description (`desc`) as they
 # might change between minor or patch version releases. They make up the
@@ -65,19 +66,16 @@ namespace :rsync do
   task :create_stage do
     next if File.directory?(fetch(:build_dir))
 
-    run_locally do
-      execute :git, 'clone', fetch(:repo_url, "."), fetch(:build_dir), '--recursive'
-    end
+    sh 'git', 'clone', fetch(:repo_url, "."), fetch(:build_dir), '--recursive'
   end
 
   desc "Stage the repository in a local directory."
   task :stage => %w[create_stage] do
-    run_locally do
-      within fetch(:build_dir) do
-        execute :git, 'fetch --quiet --all --prune'
-        execute :git, "reset --hard origin/#{fetch(:branch)}"
-        execute :git, 'submodule update --init --recursive'
-      end
+    invoke "tsg:hello"
+    Dir.chdir(fetch(:build_dir)) do
+        sh 'git', 'fetch', '--quiet', '--all', '--prune'
+        sh 'git', 'reset', '--hard',  "origin/#{fetch(:branch)}"
+        sh 'git', 'submodule', 'update', '--init', '--recursive'
     end
   end
 
@@ -95,5 +93,10 @@ namespace :rsync do
   task :create_release => %w[release]
 
   task :set_current_revision do
+    run_locally do
+        within fetch(:build_dir) do
+            set :current_revision, capture('git', 'rev-parse', '--short', "#{fetch(:branch)}").strip
+        end
+    end
   end
 end

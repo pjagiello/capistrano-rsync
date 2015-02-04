@@ -5,7 +5,7 @@ require File.expand_path("../lib/capistrano/rsync/version", __FILE__)
 Gem::Specification.new do |gem|
   gem.name = "capistrano-rsync"
   gem.version = Capistrano::Rsync::VERSION
-  gem.homepage = "https://github.com/moll/capistrano-rsync"
+  gem.homepage = "https://github.com/pjagiello/capistrano-rsync"
   gem.summary = <<-end.strip.gsub(/\s*\n\s*/, " ")
     Deploy with Rsync from any local (or remote) repository.
     Capistrano v3 ready!

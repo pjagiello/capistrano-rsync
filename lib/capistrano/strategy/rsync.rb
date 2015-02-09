@@ -20,7 +20,7 @@ namespace :load do
 
     # Where on the local machine the build happens. This is where we are
     # rsyncing from.
-    set :build_dir, "_build"
+    #set :build_dir, "_build"
 
     # Cache is used on the server to copy files to from to the release directory.
     # Saves you rsyncing your whole app folder each time.  If you nil rsync_cache,
@@ -39,23 +39,21 @@ task :rsync => %w[rsync:stage] do
 
     rsync_args = []
     rsync_args.concat fetch(:rsync_options)
-    rsync_args << fetch(:build_dir) + "/"
+    rsync_args << fetch(:export_dir) + "/"
     rsync_args << "#{user}#{role.hostname}:#{rsync_cache.call || release_path}"
 
-    run_locally do
-      execute :rsync, *rsync_args
-    end
+    sh 'rsync', *rsync_args
   end
 end
 
 namespace :rsync do
   task :hook_scm do
     Rake::Task.define_task("#{scm}:check") do
-      invoke "rsync:check" 
+      invoke "rsync:check"
     end
 
     Rake::Task.define_task("#{scm}:create_release") do
-      invoke "rsync:release" 
+      invoke "rsync:release"
     end
   end
 
@@ -64,18 +62,18 @@ namespace :rsync do
   end
 
   task :create_stage do
-    next if File.directory?(fetch(:build_dir))
+    next if File.directory?(fetch(:checkout_dir))
 
-    sh 'git', 'clone', fetch(:repo_url, "."), fetch(:build_dir), '--recursive'
+    invoke "tsg:#{fetch(:repo_type)}_create_stage"
   end
 
   desc "Stage the repository in a local directory."
   task :stage => %w[create_stage] do
-    invoke "tsg:hello"
-    Dir.chdir(fetch(:build_dir)) do
-        sh 'git', 'fetch', '--quiet', '--all', '--prune'
-        sh 'git', 'reset', '--hard',  "origin/#{fetch(:branch)}"
-        sh 'git', 'submodule', 'update', '--init', '--recursive'
+    invoke "tsg:#{fetch(:repo_type)}_stage"
+    # kopiujemy z checkout_dir do export_dir
+    if File.directory?(fetch(:checkout_dir))
+        # folder moze ciagle nie istniec, bo np. artifactory pomija checkout_dir
+        sh 'rsync', *(fetch(:rsync_copy_options)), "#{fetch(:checkout_dir)}/", fetch(:export_dir)
     end
   end
 
@@ -93,10 +91,6 @@ namespace :rsync do
   task :create_release => %w[release]
 
   task :set_current_revision do
-    run_locally do
-        within fetch(:build_dir) do
-            set :current_revision, capture('git', 'rev-parse', '--short', "#{fetch(:branch)}").strip
-        end
-    end
+    invoke "tsg:#{fetch(:repo_type)}_set_current_revision"
   end
 end
